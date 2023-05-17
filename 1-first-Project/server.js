@@ -10,10 +10,11 @@ const {
 const { notFound } = require("./controller/errorHandler.controller");
 const PORT = 3000;
 const server = http.createServer((req, res) => {
-  const apiRoute = "api";
+  const apiRoute = "/api";
   const productsRoute = `${apiRoute}/products`;
   const singleProductRoute = /\/api\/products\/[0-9]+/;
   const { url, method } = req;
+  console.log(url, productsRoute);
 
   if (url === productsRoute && method === "GET") {
     get(req, res);
