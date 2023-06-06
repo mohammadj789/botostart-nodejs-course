@@ -4,17 +4,18 @@ const {
   ErrorHandler,
   NotFoundError,
 } = require("./util/errorHandler");
+
 const {
-  loginValidator,
-  registerValidation,
+  loginValidatorSchema,
+  registerValidationSchema,
 } = require("./validator/auth.validator");
-const { validate } = require("express-validation");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post("/login", validate(loginValidator), (req, res, next) => {
+app.post("/login", async (req, res, next) => {
   try {
+    await loginValidatorSchema.validateAsync(req.body);
     res.send("accepted");
   } catch (error) {
     next(error);
@@ -22,9 +23,10 @@ app.post("/login", validate(loginValidator), (req, res, next) => {
 });
 app.post(
   "/signup",
-  validate(registerValidation),
-  (req, res, next) => {
+
+  async (req, res, next) => {
     try {
+      await registerValidationSchema.validateAsync(req.body);
       res.send("accepted");
     } catch (error) {
       next(error);
