@@ -1,0 +1,7 @@
+You are correct that the salt is included in the hashed string, so it is not a secret value. However, the salt is still effective in making it more difficult for an attacker to crack the password.
+
+The primary purpose of the salt is to prevent attackers from using pre-computed rainbow tables or other pre-computed lists of hashes to quickly identify the original password that produced a given hash. Without a salt, an attacker could easily use a pre-computed list of hashes to look up the hash value in the database and obtain the original password in plaintext. However, with a unique salt for each password, an attacker must generate a new rainbow table or brute-force attack for each individual salt, greatly increasing the time and computational resources required to crack even a single password.
+
+Additionally, the use of a salt can also prevent two users with the same password from having the same hashed value. Without a salt, an attacker could easily identify users with the same password, even if the password is hashed, simply by comparing the hash values. However, with a unique salt for each password, even users with the same password will have different hashed values, making it more difficult for an attacker to identify them.
+
+In summary, while the salt value itself is not secret, it still provides an effective defense against pre-computed attacks and makes it more difficult for an attacker to crack passwords.
