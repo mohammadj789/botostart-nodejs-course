@@ -1,0 +1,22 @@
+###register request
+
+Post http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "username":"dasdasdsad",
+  "email":"mohammadsoltanian10@gmail.com",
+  "mobile":"989135519409",
+  "password":"12345678",
+  "confirm_password":"12345678"
+}
+
+###login request
+Post http://localhost:3000/auth/login
+Content-Type: application/json
+Authorization:Bearer {{$dotenv TOKEN}}
+
+{
+  "username":"dasdasdsad",
+  "password":"12345678"
+}
