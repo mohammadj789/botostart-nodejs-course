@@ -9,4 +9,5 @@ router.use("/auth", authRoutes);
 router.use("/project", projectRoutes);
 router.use("/team", teamRoutes);
 router.use("/user", userRoutes);
+
 module.exports = { allRoutes: router };

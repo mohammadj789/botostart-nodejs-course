@@ -1,0 +1,15 @@
+###get user profile
+get http://localhost:3000/user/profile
+Content-Type: application/json
+Authorization:Bearer {{$dotenv TOKEN}}
+
+###edite user profile
+POST http://localhost:3000/user/profile
+Content-Type: application/json
+Authorization:Bearer {{$dotenv TOKEN}}
+
+{
+  "first_name":"MohammadJavad",
+  "last_name":"Soltanian",
+  "skils":["programming","nodejs","express.js"]
+}

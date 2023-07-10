@@ -8,6 +8,7 @@ const userSchema = new Schema(
     mobile: { type: String, required: true, unique: true },
     rols: { type: [String], default: ["USER"] },
     email: { type: String, required: true, unique: true },
+    profile_image: { type: String },
     password: { type: String, required: true },
     skils: { type: [String], default: [] },
     team: { type: [mongoose.Types.ObjectId], default: [] },

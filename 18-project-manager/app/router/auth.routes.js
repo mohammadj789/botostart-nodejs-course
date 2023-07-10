@@ -16,6 +16,7 @@ router.post(
   expressValidatorMapper,
   AuthController.register
 );
+
 router.post(
   "/login",
   loginValidator(),
