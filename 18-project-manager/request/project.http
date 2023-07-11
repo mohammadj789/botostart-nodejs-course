@@ -4,7 +4,6 @@ Content-Type: application/json
 Authorization:Bearer {{$dotenv TOKEN}}
 
 {
-  "":"MohammadJavad",
-  "first_name":"MohammadJavad"
-  
+    "title": "fft",
+    "text": "write an fft code to make an image smaller in frequency domain"
 }

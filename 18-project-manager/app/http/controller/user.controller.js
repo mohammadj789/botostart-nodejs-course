@@ -1,16 +1,15 @@
 const { body } = require("express-validator");
 const { userModel } = require("../../model/user");
+const { createLinkForFiles } = require("../../module/functions");
 
 class UserController {
   getProfile(req, res, next) {
     try {
       const user = req.user;
-      user.profile_image =
-        req.protocol +
-        "://" +
-        req.get("host") +
-        "/" +
-        user.profile_image;
+      user.profile_image = createLinkForFiles(
+        req,
+        user.profile_image
+      );
       return res
         .status(200)
         .json({ status: 200, success: true, user });
@@ -54,7 +53,7 @@ class UserController {
   async uploadProfileImage(req, res, next) {
     try {
       const userId = req.user._id;
-      if (Object.keys(req.file).length == 0)
+      if (!req.file)
         throw {
           status: 400,
           message: "please select a file to upload",

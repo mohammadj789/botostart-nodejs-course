@@ -12,7 +12,7 @@ const editValidator = () => {
       .optional()
       .trim()
       .notEmpty()
-      .isAlpha()
+      .isAlpha("en-US", { ignore: " " })
       .withMessage("wrong last name format"),
     body("skils")
       .optional()

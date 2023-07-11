@@ -28,6 +28,9 @@ const verifyToken = (token) => {
     throw { status: 401, message: "please login to your account" };
   return result;
 };
+const createLinkForFiles = (req, path) => {
+  return req.protocol + "://" + req.get("host") + "/" + path;
+};
 const createUploadPath = () => {
   const date = new Date();
   const Year = date.getFullYear() + "";
@@ -53,4 +56,5 @@ module.exports = {
   comparePassword,
   tokenGenerator,
   verifyToken,
+  createLinkForFiles,
 };
