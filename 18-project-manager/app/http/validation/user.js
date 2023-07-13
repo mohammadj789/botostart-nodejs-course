@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const path = require("path");
 const editValidator = () => {
   return [
@@ -46,8 +46,16 @@ const editValidator = () => {
 //     }),
 //   ];
 // };
-
+const userInviteRequestValidator = () => [
+  param("id").isMongoId().withMessage("invalid mongo objectID"),
+  param("status").custom((status) => {
+    if (!["accept", "reject"].includes(status))
+      throw "status must be either accept or reject";
+    return true;
+  }),
+];
 module.exports = {
   editValidator,
+  userInviteRequestValidator,
   // imageValidator
 };

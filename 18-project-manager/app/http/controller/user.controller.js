@@ -1,7 +1,7 @@
 const { body } = require("express-validator");
 const { userModel } = require("../../model/user");
 const { createLinkForFiles } = require("../../module/functions");
-
+const { teamModel } = require("../../model/team");
 class UserController {
   getProfile(req, res, next) {
     try {
@@ -80,9 +80,138 @@ class UserController {
       next(error);
     }
   }
-  addSkills() {}
-  editSkill() {}
-  acceptInviteTeam() {}
-  rejectInviteTeam() {}
+  async getAllRequests(req, res, next) {
+    try {
+      const userId = req.user._id;
+      const requests = await userModel.aggregate([
+        { $match: { _id: userId } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "inviteRequests.caller",
+            foreignField: "username",
+            as: "inviteRequests.caller",
+          },
+        },
+        {
+          $project: {
+            inviteRequests: 1,
+            // "inviteRequests.caller.first_name": 1,
+            // "inviteRequests.caller.last_name": 1,
+            // "inviteRequests.caller.mobile": 1,
+            // "inviteRequests.caller.email": 1,
+          },
+        },
+      ]);
+
+      return res.status(200).json({
+        status: 200,
+        success: true,
+        requests: requests?.[0].inviteRequests || [],
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getRequestsByStatus(req, res, next) {
+    try {
+      const userId = req.user._id;
+      const { status } = req.params;
+      const request = await userModel.aggregate([
+        { $match: { _id: userId } },
+        {
+          $project: {
+            inviteRequests: 1,
+            _id: 0,
+            inviteRequests: {
+              $filter: {
+                input: "$inviteRequests",
+                as: "request",
+                cond: { $eq: ["$$request.status", status] },
+              },
+            },
+          },
+        },
+      ]);
+      return res.status(200).json({
+        status: 200,
+        success: true,
+        request: request?.[0]?.inviteRequests || [],
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async changeStatusRequest(req, res, next) {
+    try {
+      const { id: requestId, status } = req.params;
+      const { user } = req;
+
+      const request = await userModel.findOne(
+        {
+          _id: user._id,
+          inviteRequests: {
+            $elemMatch: {
+              _id: requestId,
+            },
+          },
+        },
+        {
+          "inviteRequests.$": 1,
+        }
+      );
+
+      if (!request)
+        throw {
+          status: 400,
+          message:
+            "no inveite request were found with this specification ",
+        };
+      if (request?.inviteRequests?.[0]?.status !== "pending")
+        throw {
+          status: 400,
+          message: "this request has been responsed before",
+        };
+      const userUpdateResult = await userModel.updateOne(
+        {
+          _id: user._id,
+          inviteRequests: {
+            $elemMatch: {
+              _id: requestId,
+            },
+          },
+        },
+        {
+          $set: {
+            "inviteRequests.$.status": status,
+          },
+        }
+      );
+      if (userUpdateResult.matchedCount === 0)
+        throw {
+          status: 500,
+          message:
+            "something went wrong while updating request status",
+        };
+
+      if (status === "accept") {
+        await teamModel.updateOne(
+          { _id: request?.inviteRequests?.[0]?.teamId },
+          { $addToSet: { users: user._id } }
+        );
+      }
+      return res.status(200).json({
+        status: 200,
+        success: true,
+        message:
+          status === "accept"
+            ? "wellcome to your new team"
+            : "you've rejected this team",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 module.exports = { UserController: new UserController() };

@@ -20,8 +20,12 @@ class AuthController {
         mobile,
         password: hash_password,
       });
-
-      return res.send(user);
+      if (!user)
+        throw {
+          status: 500,
+          message: "something went wrong while registering you",
+        };
+      return res.status(201).send(user);
     } catch (error) {
       next(error);
     }
