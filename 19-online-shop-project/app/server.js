@@ -16,11 +16,34 @@ module.exports = class Application {
   configApplication() {
     const morgan = require("morgan");
     const path = require("path");
+    const swaggerUI = require("swagger-ui-express");
+    const swaggerJsDoc = require("swagger-jsdoc");
     this.#app.use(morgan("dev"));
     this.#app.use(this.#express.json());
     this.#app.use(this.#express.urlencoded({ extended: true }));
     this.#app.use(
       this.#express.static(path.join(__dirname, "..", "public"))
+    );
+    this.#app.use(
+      "/api-doc",
+      swaggerUI.serve,
+      swaggerUI.setup(
+        swaggerJsDoc({
+          swaggerDefinition: {
+            info: {
+              title: "online shop",
+              version: "1.0.0",
+              description: "online shop with lots of features",
+              contact: {
+                email: "mohammadsoltanian10@gmail.com",
+                name: "mohammadjavad soltanian",
+              },
+            },
+            servers: [{ url: `http://localhost:${this.#PORT}` }],
+          },
+          apis: ["./app/router/*/*.js"],
+        })
+      )
     );
   }
   configServer() {
