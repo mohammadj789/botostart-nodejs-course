@@ -1,11 +1,10 @@
 const { UserModel } = require("../../../../model/user");
-const {
-  EXPIRES_IN,
-  USER_ROLE,
-} = require("../../../../utils/Constants");
+const { ROLS } = require("../../../../utils/Constants");
 const {
   randomNumberGenerator,
   signAccessToken,
+  verifyRefreshToken,
+  signRefreshToken,
 } = require("../../../../utils/functions");
 const {
   getOtpSchema,
@@ -55,17 +54,30 @@ class UserAuthController extends Controller {
       if (user.otp.expiresIn < new Date().getTime())
         throw createHttpError.Unauthorized("your code has exprired");
       const accessToken = await signAccessToken(user._id);
-      res.status(200).json({ data: { accessToken } });
+      const refreshToken = await signRefreshToken(user._id);
+      res.status(200).json({ data: { accessToken, refreshToken } });
       res.send();
     } catch (error) {
       next(error);
     }
   }
-
+  async refreshToken(req, res, next) {
+    try {
+      const { refreshToken } = req.body;
+      const userId = await verifyRefreshToken(refreshToken);
+      const accessToken = await signAccessToken(userId);
+      const newRefreshToken = await signRefreshToken(userId);
+      return res.json({
+        data: { accessToken, refreshToken: newRefreshToken },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
   async saveUser(mobile, code) {
     const otp = {
       code,
-      expiresIn: EXPIRES_IN,
+      expiresIn: new Date().getTime() + 120000,
     };
 
     const result = await this.CheckExistingUser(mobile);
@@ -76,7 +88,7 @@ class UserAuthController extends Controller {
     return !!(await UserModel.create({
       mobile,
       otp,
-      Role: [USER_ROLE],
+      Role: [ROLS.USER],
     }));
   }
 

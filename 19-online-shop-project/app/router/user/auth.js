@@ -68,4 +68,27 @@ router.post("/get-otp", UserAuthController.getOtp);
  *
  */
 router.post("/check-otp", UserAuthController.checkOtp);
+/**
+ * @swagger
+
+ * /user/refresh-token:
+ *  post:
+ *    summary: renew accestoken
+ *    description: when accesstoken is about to expire we can get new one with refresh token
+ *    tags: [User-Authentication]
+ *    parameters:
+ *    - name: refreshToken
+ *      in: formdata
+ *      required: true 
+ *      type: string
+ *    responses:
+ *      200:
+ *        description: Success login
+ *      404:
+ *        description: not found
+ *      500:
+ *        description: InteranServerError
+ *
+ */
+router.post("/refresh-token", UserAuthController.refreshToken);
 module.exports = { UserAuthRoutes: router };

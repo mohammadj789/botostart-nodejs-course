@@ -8,6 +8,7 @@ module.exports = class Application {
     this.#PORT = PORT;
     this.#DB_URL = DB_URL;
     this.configApplication();
+    this.configRedis();
     this.configDatabase();
     this.configServer();
     this.configRoutes();
@@ -18,6 +19,8 @@ module.exports = class Application {
     const path = require("path");
     const swaggerUI = require("swagger-ui-express");
     const swaggerJsDoc = require("swagger-jsdoc");
+    const cors = require("cors");
+    this.#app.use(cors());
     this.#app.use(morgan("dev"));
     this.#app.use(this.#express.json());
     this.#app.use(this.#express.urlencoded({ extended: true }));
@@ -41,7 +44,7 @@ module.exports = class Application {
             },
             servers: [{ url: `http://localhost:${this.#PORT}` }],
           },
-          apis: ["./app/router/*/*.js"],
+          apis: ["./app/router/*/*.js", "./app/router/*.js"],
         })
       )
     );
@@ -73,6 +76,9 @@ module.exports = class Application {
 
       process.exit(0);
     });
+  }
+  configRedis() {
+    const redisClient = require("./utils/init_redis");
   }
   configRoutes() {
     const { AllRoutes } = require("./router/routes");
