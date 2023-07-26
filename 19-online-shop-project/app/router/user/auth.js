@@ -78,7 +78,7 @@ router.post("/check-otp", UserAuthController.checkOtp);
  *    tags: [User-Authentication]
  *    parameters:
  *    - name: refreshToken
- *      in: formdata
+ *      in: formData
  *      required: true 
  *      type: string
  *    responses:

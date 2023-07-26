@@ -10,7 +10,8 @@ const verifyAccessToken = (req, res, next) => {
 
   if (token && bearer?.toLowerCase() === "bearer")
     JWT.verify(token, ACCESS_TOKEN_SECRET_KEY, async (err, data) => {
-      if (err) return next(createHttpError.InternalServerError());
+      if (err)
+        return next(createHttpError.InternalServerError(err.message));
 
       const { mobile } = data;
       if (!mobile) return next(createHttpError.NotFound());

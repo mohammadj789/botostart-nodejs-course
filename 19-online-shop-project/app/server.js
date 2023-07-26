@@ -42,6 +42,16 @@ module.exports = class Application {
                 name: "mohammadjavad soltanian",
               },
             },
+            // components: {
+            //   securitySchemes: {
+            //     BearerAuth: { type: "http", scheme: "bearer" },
+            //   },
+            // },
+            // security: [
+            //   {
+            //     bearerAuth: [],
+            //   },
+            // ],
             servers: [{ url: `http://localhost:${this.#PORT}` }],
           },
           apis: ["./app/router/*/*.js", "./app/router/*.js"],

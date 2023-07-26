@@ -56,26 +56,26 @@ class CategoryController extends Controller {
   }
   async getAllCategory(req, res, next) {
     try {
-      const categories = await CategoryModel.aggregate([
-        { $match: { parent: undefined } },
-        {
-          $graphLookup: {
-            from: "categories",
-            startWith: "$_id",
-            connectFromField: "_id",
-            connectToField: "parent",
-            maxDepth: 5,
-            depthField: "depth",
-            as: "children",
-          },
-        },
-        {
-          $project: {
-            __v: 0,
-            "children.__v": 0,
-          },
-        },
-      ]);
+      // const categories = await CategoryModel.aggregate([
+      //   { $match: { parent: undefined } },
+      //   {
+      //     $graphLookup: {
+      //       from: "categories",
+      //       startWith: "$_id",
+      //       connectFromField: "_id",
+      //       connectToField: "parent",
+      //       maxDepth: 5,
+      //       depthField: "depth",
+      //       as: "children",
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       __v: 0,
+      //       "children.__v": 0,
+      //     },
+      //   },
+      // ]);
       // const categories = await CategoryModel.aggregate([
       //   { $match: { parent: undefined } },
       //   {
@@ -93,6 +93,13 @@ class CategoryController extends Controller {
       //     },
       //   },
       // ]);
+      const categories = await CategoryModel.find(
+        {
+          parent: undefined,
+        },
+        { __v: 0 }
+      );
+
       if (!categories || categories?.length === 0)
         throw createHttpError.NotFound("there is not any category");
       res.status(200).json({ data: { categories } });
@@ -103,7 +110,6 @@ class CategoryController extends Controller {
   async deleteCategory(req, res, next) {
     try {
       const { id } = req.params;
-      console.log(id);
 
       await getparendschildSchema.validateAsync({ parent: id });
       const category = await this.checkExistingCategory(id);
@@ -163,6 +169,35 @@ class CategoryController extends Controller {
 
     if (!category) throw createHttpError.NotFound();
     return category;
+  }
+
+  async updateCategory(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      await getparendschildSchema.validateAsync({ parent: id });
+      await createCategorySchema.validateAsync(req.body);
+
+      const category = await this.checkExistingCategory(id);
+
+      const updateResult = await CategoryModel.updateOne(
+        { _id: category._id },
+        {
+          $set: req.body,
+        }
+      );
+      if (updateResult.modifiedCount === 0)
+        throw createHttpError.InternalServerError();
+
+      res.status(200).json({
+        data: {
+          status: 200,
+          message: "category was updated successfully",
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 module.exports = { CategoryController: new CategoryController() };

@@ -1,6 +1,8 @@
 const createHttpError = require("http-errors");
 const JWT = require("jsonwebtoken");
 const { UserModel } = require("../model/user");
+const path = require("path");
+const fs = require("fs");
 const {
   ACCESS_TOKEN_SECRET_KEY,
 
@@ -51,18 +53,22 @@ const signRefreshToken = (userId) =>
 const verifyRefreshToken = (token) => {
   return new Promise((resolve, reject) =>
     JWT.verify(token, REFRESH_TOKEN_SECRET_KEY, async (err, data) => {
-      if (err) reject(createHttpError.InternalServerError());
+      if (err)
+        return reject(
+          createHttpError.InternalServerError(err.message)
+        );
 
-      const { mobile } = data;
-      if (!mobile) reject(createHttpError.NotFound());
+      const mobile = data?.mobile;
+      if (!mobile) return reject(createHttpError.NotFound());
 
       const user = await UserModel.findOne(
         { mobile },
         { password: 0, bills: 0, otp: 0 }
       );
-      if (!user) reject(createHttpError.NotFound());
 
-      const redisToken = await redisClient.get(user._id.toString());
+      if (!user) return reject(createHttpError.NotFound());
+
+      const redisToken = await redisClient.get(user?._id?.toString());
       if (!redisToken || redisToken !== token)
         reject(createHttpError.Unauthorized("please login again"));
 
@@ -70,10 +76,15 @@ const verifyRefreshToken = (token) => {
     })
   );
 };
+const removeErrorFile = (filePath) => {
+  const addr = path.join(__dirname, "..", "..", "public", filePath);
+  fs.unlinkSync(addr);
+};
 
 module.exports = {
   randomNumberGenerator,
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken,
+  removeErrorFile,
 };

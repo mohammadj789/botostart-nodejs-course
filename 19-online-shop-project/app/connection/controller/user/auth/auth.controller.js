@@ -44,7 +44,6 @@ class UserAuthController extends Controller {
         mobile,
       });
       if (!user) throw createHttpError.NotFound("user not found");
-      console.log(code, user.otp.code);
 
       if (user.otp.code !== code)
         throw createHttpError.Unauthorized(
@@ -64,6 +63,7 @@ class UserAuthController extends Controller {
   async refreshToken(req, res, next) {
     try {
       const { refreshToken } = req.body;
+
       const userId = await verifyRefreshToken(refreshToken);
       const accessToken = await signAccessToken(userId);
       const newRefreshToken = await signRefreshToken(userId);

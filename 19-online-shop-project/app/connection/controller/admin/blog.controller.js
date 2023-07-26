@@ -1,0 +1,122 @@
+const createHttpError = require("http-errors");
+const { BlogModel } = require("../../../model/bolg");
+const Controller = require("../controller");
+const path = require("path");
+const { removeErrorFile } = require("../../../utils/functions");
+const {
+  createBlogSchema,
+} = require("../../validator/admin/blog.Schema");
+
+class BlogContoller extends Controller {
+  async createBlog(req, res, next) {
+    try {
+      req.body.image = path
+        .join(req.body.fileUploadPath, req.body.fileName)
+        .replace(/(\\)/gim, "/");
+
+      await createBlogSchema.validateAsync(req.body);
+      const blog = await BlogModel.create({
+        ...req.body,
+        author: req.user._id,
+      });
+      if (!blog) throw createHttpError.InternalServerError();
+      res.status(200).send({
+        dat: {
+          status: 201,
+          message: "blog was created successfully",
+        },
+      });
+    } catch (error) {
+      removeErrorFile(req.body.image);
+      next(error);
+    }
+  }
+  async getAllBlogs(req, res, next) {
+    try {
+      const blogs = await BlogModel.aggregate([
+        {
+          $lookup: {
+            foreignField: "_id",
+            localField: "author",
+            from: "users",
+            as: "author",
+          },
+        },
+        { $unwind: "$author" },
+        {
+          $lookup: {
+            foreignField: "_id",
+            localField: "category",
+            from: "categories",
+            as: "category",
+          },
+        },
+
+        {
+          $project: {
+            "author.otp": 0,
+            "author.bills": 0,
+            "author.discount": 0,
+            "author.Role": 0,
+          },
+        },
+        { $unwind: "$author" },
+      ]);
+      if (!blogs || blogs.length === 0)
+        throw createHttpError.NotFound(
+          "ther is not any blogs available"
+        );
+      res.status(200).json(blogs);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getBlogById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const blog = await this.findBlog({ _id: id });
+      res.status(200).json({ data: { status: 200, blog } });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteBlogById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const blog = await this.findBlog({ _id: id });
+      const deleteResult = await BlogModel.deleteOne({
+        _id: blog._id,
+      });
+      if (deleteResult.deletedCount === 0)
+        throw createHttpError.InternalServerError();
+
+      res.status(200).json({
+        data: {
+          status: 200,
+          message: "blog was seccessfully removed",
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getCommentOfBlog(req, res, next) {}
+  async updateBlogById(req, res, next) {}
+  async findBlog(query = {}) {
+    const blog = await BlogModel.findOne(query).populate([
+      {
+        path: "category",
+      },
+      {
+        path: "author",
+        select: { bills: 0, Role: 0, otp: 0, discount: 0 },
+      },
+    ]);
+
+    if (!blog) throw createHttpError.NotFound("no blog were found");
+
+    return blog;
+  }
+}
+module.exports = { BlogContoller: new BlogContoller() };
