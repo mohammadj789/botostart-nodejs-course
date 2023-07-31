@@ -9,6 +9,7 @@ const {
   REFRESH_TOKEN_SECRET_KEY,
 } = require("./Constants");
 const redisClient = require("../utils/init_redis");
+
 const randomNumberGenerator = () =>
   Math.round(Math.random() * 90000) + 1000;
 const signAccessToken = (userId) =>
@@ -80,6 +81,22 @@ const removeErrorFile = (filePath) => {
   const addr = path.join(__dirname, "..", "..", "public", filePath);
   fs.unlinkSync(addr);
 };
+const copyObject = (object) => {
+  return JSON.parse(JSON.stringify(object));
+};
+const purifyUpdateValues = (data = {}, blackList = []) => {
+  const nullish = ["0", 0, null, undefined, ""];
+  Object.keys(data).forEach((key) => {
+    if (blackList.includes(key)) delete data[key];
+    if ((typeof data[key])?.toLowerCase() === "string")
+      data[key] = data[key].trim();
+    if (Array.isArray(data[key]) && data[key].length > 0)
+      data[key] = data[key].map((index) => index.trim());
+    if (Array.isArray(data[key]) && data[key].length === 0)
+      delete data[key];
+    if (nullish.includes(data[key])) delete data[key];
+  });
+};
 
 module.exports = {
   randomNumberGenerator,
@@ -87,4 +104,6 @@ module.exports = {
   signRefreshToken,
   verifyRefreshToken,
   removeErrorFile,
+  copyObject,
+  purifyUpdateValues,
 };

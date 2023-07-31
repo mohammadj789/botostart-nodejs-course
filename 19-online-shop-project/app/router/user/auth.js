@@ -6,6 +6,42 @@ const {
 const router = Router();
 /**
  * @swagger
+ *  components:
+ *    schemas:
+ *      GetOtp:
+ *        type: object
+ *        required:
+ *          - mobile
+ *        properties:
+ *          mobile:
+ *            type: string
+ *            description: User's phone number for OTP generation.
+ *
+ *      CheckOtp:
+ *        type: object
+ *        required:
+ *          - mobile
+ *          - code
+ *        properties:
+ *          mobile:
+ *            type: string
+ *            description: User's phone number for OTP verification.
+ *          code:
+ *            type: string
+ *            description: OTP code sent to the user's phone number.
+ * 
+ *      RefreshToken:
+ *        type: object
+ *        required:
+ *          - refreshToken
+ *        properties:
+ *          refreshToken:
+ *            type: string
+ *            description: existing refresh token to generate new access token
+
+ */
+/**
+ * @swagger
  * tags:
  *  name: User-Authentication
  *  description: user auth section
@@ -19,12 +55,15 @@ const router = Router();
  *    summary: Authenticate user
  *    description: Authenticate user using phone and if its not registered makes an account using OTP
  *    tags: [User-Authentication]
- *    parameters:
- *    - name: mobile
- *      description: fa-IRI phone number
- *      in: formData
- *      required: trus
- *      type: string
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/x-www-form-urlencoded:
+ *         schema:
+ *          $ref: '#/components/schemas/GetOtp'
+ *        application/json:
+ *         schema:
+ *          $ref: '#/components/schemas/GetOtp'
  *    responses:
  *      200:
  *        description: Success login
@@ -45,17 +84,17 @@ router.post("/get-otp", UserAuthController.getOtp);
  *    summary: check otp value in user controller
  *    description: check if ot p code matches with mobile and is valid or nat
  *    tags: [User-Authentication]
- *    parameters:
- *    - name: mobile
- *      description: fa-IRI phone number
- *      in: formData
- *      required: true 
- *      type: string
- *    - name: code
- *      description: otp code recived throgh sms 
- *      in: formData
- *      required: true 
- *      type: string
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/x-www-form-urlencoded:
+ *          schema:
+ *            $ref: '#/components/schemas/CheckOtp'
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/CheckOtp'
+ *          
+ *
  *    responses:
  *      200:
  *        description: Success login
@@ -76,11 +115,15 @@ router.post("/check-otp", UserAuthController.checkOtp);
  *    summary: renew accestoken
  *    description: when accesstoken is about to expire we can get new one with refresh token
  *    tags: [User-Authentication]
- *    parameters:
- *    - name: refreshToken
- *      in: formData
- *      required: true 
- *      type: string
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/x-www-form-urlencoded:
+ *          schema:
+ *            $ref: '#/components/schemas/RefreshToken'
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/RefreshToken'
  *    responses:
  *      200:
  *        description: Success login

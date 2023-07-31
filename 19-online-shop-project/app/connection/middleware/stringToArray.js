@@ -7,6 +7,10 @@ const stringToArray = (fields) => {
           req.body[fields] = fieldValue
             .split("#")
             .map((item) => item.trim());
+        else if (fieldValue.includes(","))
+          req.body[fields] = fieldValue
+            .split(",")
+            .map((item) => item.trim());
         else req.body[fields] = [fieldValue];
       } else if (Array.isArray(fieldValue))
         req.body[fields] = fieldValue.map((item) => item.trim());

@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
   bills: { type: [], default: [] },
   discount: { type: Number, default: 0 },
   birthday: { type: String },
+  courses: {
+    type: [mongoose.Types.ObjectId],
+    ref: "course",
+    default: [],
+  },
   Role: { type: [String], default: "USER" },
 });
 const UserModel = mongoose.model("user", userSchema);

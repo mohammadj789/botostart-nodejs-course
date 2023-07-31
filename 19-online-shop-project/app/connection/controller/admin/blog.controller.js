@@ -10,9 +10,10 @@ const {
 class BlogContoller extends Controller {
   async createBlog(req, res, next) {
     try {
-      req.body.image = path
-        .join(req.body.fileUploadPath, req.body.fileName)
-        .replace(/(\\)/gim, "/");
+      if (req?.body?.fileUploadPath && req?.body?.fileName)
+        req.body.image = path
+          .join(req.body.fileUploadPath, req.body.fileName)
+          ?.replace(/(\\)/gim, "/");
 
       await createBlogSchema.validateAsync(req.body);
       const blog = await BlogModel.create({
@@ -20,14 +21,14 @@ class BlogContoller extends Controller {
         author: req.user._id,
       });
       if (!blog) throw createHttpError.InternalServerError();
-      res.status(200).send({
+      res.status(201).send({
         dat: {
           status: 201,
           message: "blog was created successfully",
         },
       });
     } catch (error) {
-      removeErrorFile(req.body.image);
+      req?.body?.image && removeErrorFile(req.body.image);
       next(error);
     }
   }
@@ -102,7 +103,61 @@ class BlogContoller extends Controller {
     }
   }
   async getCommentOfBlog(req, res, next) {}
-  async updateBlogById(req, res, next) {}
+  async updateBlogById(req, res, next) {
+    try {
+      const { id } = req.params;
+      await this.findBlog({ _id: id });
+
+      if (req?.body?.fileUploadPath && req?.body?.fileName)
+        req.body.image = path
+          .join(req.body.fileUploadPath, req.body.fileName)
+          ?.replace(/(\\)/gim, "/");
+
+      const data = req.body;
+      console.log(data);
+
+      const allowedUpdateFields = [
+        "title",
+        "tags",
+        "text",
+        "short_text",
+        "category",
+        "image",
+      ];
+      const nullishValues = ["", 0, null, undefined];
+      Object.keys(data).forEach((item) => {
+        if (!allowedUpdateFields.includes(item)) delete data[item];
+
+        if ((typeof data[item])?.toLowerCase() === "string")
+          data[item] = data[item].trim();
+
+        if (Array.isArray(data[item]) && data[item].length > 0)
+          data[item] = data[item].map((index) => index.trim());
+
+        if (nullishValues.includes(data[item])) delete data[item];
+      });
+      const updateResult = await BlogModel.updateOne(
+        { _id: id },
+        {
+          $set: {
+            ...data,
+            author: req.user._id,
+          },
+        }
+      );
+      if (updateResult.modifiedCount === 0)
+        throw createHttpError.InternalServerError();
+      res.status(200).send({
+        dat: {
+          status: 200,
+          message: "blog was updated successfully",
+        },
+      });
+    } catch (error) {
+      req?.body?.image && removeErrorFile(req.body.image);
+      next(error);
+    }
+  }
   async findBlog(query = {}) {
     const blog = await BlogModel.findOne(query).populate([
       {

@@ -33,29 +33,36 @@ module.exports = class Application {
       swaggerUI.setup(
         swaggerJsDoc({
           swaggerDefinition: {
+            openapi: "3.0.0",
             info: {
               title: "online shop",
               version: "1.0.0",
-              description: "online shop with lots of features",
+              description:
+                "online shop with lots of features \n eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTEzNTUxOTQwOSIsImlhdCI6MTY5MDcyNzIxOSwiZXhwIjoxNzIyMjg0ODE5fQ.5oKCXxZSmiL68tJxCp7Ar6RXvD3OkhGFNBfVDf-7r7A",
               contact: {
                 email: "mohammadsoltanian10@gmail.com",
                 name: "mohammadjavad soltanian",
               },
             },
-            // components: {
-            //   securitySchemes: {
-            //     BearerAuth: { type: "http", scheme: "bearer" },
-            //   },
-            // },
-            // security: [
-            //   {
-            //     bearerAuth: [],
-            //   },
-            // ],
             servers: [{ url: `http://localhost:${this.#PORT}` }],
+            components: {
+              securitySchemes: {
+                BearerAuth: {
+                  type: "http",
+                  scheme: "bearer",
+                  bearerFormat: "JWT",
+                },
+              },
+            },
+            security: [
+              {
+                BearerAuth: [],
+              },
+            ],
           },
           apis: ["./app/router/*/*.js", "./app/router/*.js"],
-        })
+        }),
+        { explorer: true }
       )
     );
   }

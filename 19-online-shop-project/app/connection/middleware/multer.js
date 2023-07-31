@@ -35,16 +35,34 @@ const createRoute = (req) => {
 };
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const path = createRoute(req);
-    fs.mkdirSync(path, { recursive: true });
-    cb(null, path);
+    if (file?.originalname) {
+      const path = createRoute(req);
+      fs.mkdirSync(path, { recursive: true });
+      return cb(null, path);
+    }
+
+    cb(null, null);
   },
   filename: async (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const fileName =
-      Date.now() * Math.round((Math.random() + 2) * 13) + ext;
-    req.body.fileName = fileName;
-    cb(null, fileName);
+    if (file?.originalname) {
+      const ext = path.extname(file.originalname);
+      const fileName =
+        Date.now() * Math.round((Math.random() + 2) * 13) + ext;
+      // if (req.body.fileName) {
+      //   const bodyFile = req.body.fileName;
+      //   if (!Array.isArray(bodyFile)) {
+      //     req.body.fileName = [bodyFile];
+      //     req.body.fileName.push(fileName);
+      //   } else if (Array.isArray(bodyFile) && bodyFile.length)
+      //     req.body.fileName.push(fileName);
+      // } else req.body.fileName = fileName;
+
+      if (req.body.fileName) req.body.fileName += `#${fileName}`;
+      else req.body.fileName = fileName;
+      return cb(null, fileName);
+    }
+
+    cb(null, null);
   },
 });
 const fileFilter = (req, file, cb) => {

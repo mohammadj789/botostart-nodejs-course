@@ -6,20 +6,37 @@ const router = Router();
 
 /**
  * @swagger
+ *  components:
+ *    schemas:
+ *      category:
+ *        type: object
+ *        required:
+ *          - title
+ *        properties:
+ *          title:
+ *            type: string
+ *            description: title of the category
+ *          parent:
+ *            type: string
+ *            description: parent id of the category
+ */
+
+/**
+ * @swagger
 
  * /admin/category/create:
  *  post:
  *    summary: add category
  *    description: Create a new category
- *    parameters:
- *      - in: formData
- *        name: title
- *        type: string
- *        required: true
- *      - in: formData
- *        name: parent
- *        type: string
-
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/x-www-form-urlencoded:
+ *          schema:
+ *            $ref: '#/components/schemas/category'
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/category'
  *    tags: [Category(Admin)]
  *    responses:
  *      201:
@@ -83,7 +100,6 @@ router.get("/children/:parent", CategoryController.getChildOfParent);
  *  get:
  *    summary: get all categories
  *    tags: [Category(Admin)]
-
  *    responses:
  *      200:
  *        description: Success
@@ -162,10 +178,15 @@ router.get("/:id", CategoryController.getCategoryById);
  *         required: true
  *         schema:
  *           type: string
- *       - in: formData
- *         name: title
- *         description: The ID of the category to remove
- *         required: true
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             $ref: '#/components/schemas/category'
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/category'
  *     responses:
  *       200:
  *         description: Success

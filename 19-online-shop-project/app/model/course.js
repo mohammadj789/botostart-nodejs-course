@@ -1,20 +1,21 @@
 const { default: mongoose } = require("mongoose");
 const { comentSchema } = require("./public.schema");
-const featureSchema = new mongoose.Schema({
-  height: { type: Number, default: 0 },
-  length: { type: Number, default: 0 },
-  width: { type: Number, default: 0 },
-  weight: { type: Number, default: 0 },
-  color: { type: [String], default: [] },
-  model: { type: [String], default: [] },
-  madeIn: { type: String, default: "0" },
+const episode = mongoose.Schema({
+  title: { type: String, required: true },
+  text: { type: String, required: true },
+  type: { type: String, default: "free" },
+  time: { type: String, required: true },
 });
-
-const productSchema = new mongoose.Schema({
+const chapter = mongoose.Schema({
+  title: { type: String, required: true },
+  text: { type: String, default: "" },
+  episodes: { type: [episode], default: "" },
+});
+const courseSchema = new mongoose.Schema({
   title: { type: String, required: true },
   text: { type: String, required: true },
   short_text: { type: String, required: true },
-  images: { type: [String], required: true },
+  image: { type: String, required: true },
   tags: { type: [String], default: [] },
   category: {
     type: mongoose.Types.ObjectId,
@@ -31,23 +32,23 @@ const productSchema = new mongoose.Schema({
   bookmark: { type: [mongoose.Types.ObjectId], default: [] },
   price: { type: Number, default: 0 },
   discount: { type: Number, default: 0 },
-  count: { type: Number },
-  type: { type: String, required: true },
+  type: { type: String, default: "free", required: true },
 
-  format: { type: String },
-  supplier: {
+  time: { type: String, default: "00:00:00" },
+  teacher: {
     type: mongoose.Types.ObjectId,
     ref: "user",
     required: true,
   },
-  feature: {
-    type: featureSchema,
+  chapter: {
+    type: [chapter],
+    default: [],
+  },
+  students: {
+    type: [mongoose.Types.ObjectId],
+    ref: "user",
+    default: [],
   },
 });
-productSchema.index({
-  text: "text",
-  short_text: "text",
-  title: "text",
-});
-const ProductModel = mongoose.model("product", productSchema);
-module.exports = { ProductModel };
+const CourseModel = mongoose.model("course", courseSchema);
+module.exports = { CourseModel };
