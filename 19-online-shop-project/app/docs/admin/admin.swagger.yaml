@@ -1,0 +1,15 @@
+tags:
+  - name: Admin
+    description: All routes related Admin (CRUD)
+
+  - name: Category(Admin)
+    description: All routes related category and modifing them
+
+  - name: Blog(Admin)
+    description: All routes related Blogs and modifing themm
+
+  - name: Product(Admin)
+    description: All routes related to pshycal an virtual products and its routes
+
+  - name: course(Admin)
+    description: All routes related to courses its routes

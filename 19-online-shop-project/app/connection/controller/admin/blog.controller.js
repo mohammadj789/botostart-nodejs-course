@@ -102,7 +102,7 @@ class BlogContoller extends Controller {
       next(error);
     }
   }
-  async getCommentOfBlog(req, res, next) {}
+  // async getCommentOfBlog(req, res, next) {}
   async updateBlogById(req, res, next) {
     try {
       const { id } = req.params;

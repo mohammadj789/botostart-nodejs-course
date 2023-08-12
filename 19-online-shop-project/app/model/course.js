@@ -33,7 +33,7 @@ const courseSchema = new mongoose.Schema({
   price: { type: Number, default: 0 },
   discount: { type: Number, default: 0 },
   type: { type: String, default: "free", required: true },
-
+  status: { type: String, default: "not started" },
   time: { type: String, default: "00:00:00" },
   teacher: {
     type: mongoose.Types.ObjectId,
@@ -49,6 +49,11 @@ const courseSchema = new mongoose.Schema({
     ref: "user",
     default: [],
   },
+});
+courseSchema.index({
+  title: "text",
+  text: "text",
+  short_text: "text",
 });
 const CourseModel = mongoose.model("course", courseSchema);
 module.exports = { CourseModel };

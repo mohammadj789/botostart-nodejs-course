@@ -1,0 +1,101 @@
+components:
+  schemas:
+    course:
+      type: object
+      required:
+        - title
+        - text
+        - short_text
+        - tags
+        - category
+        - discount
+        - price
+        - type
+        - image
+      properties:
+        title:
+          type: string
+          description: title of the course
+        text:
+          type: string
+          description: text of the course
+        short_text:
+          type: string
+          description: short intro to the course
+        image:
+          type: file
+          description: image of the course
+        price:
+          type: string
+          description: price of the course
+        discount:
+          type: string
+          description: discount on the course
+        tags:
+          type: array
+          description: tags related to the course
+        category:
+          type: string
+          description: category of course (objectId)
+        type:
+          $ref: "#components/schemas/coursetype"
+
+    coursetype:
+      type: string
+      enum:
+        - free
+        - paid
+        - special
+
+paths:
+  /admin/course/all:
+    get:
+      summary: get all course
+      tags: [course(Admin)]
+      parameters:
+        - in: query
+          name: search
+          type: string
+          description: search courses in db by text title short_text
+
+      responses:
+        200:
+          description: success
+        404:
+          description: not found
+
+  /admin/course/add:
+    post:
+      summary: create a course
+      tags: [course(Admin)]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#components/schemas/course"
+      responses:
+        201:
+          description: created
+        403:
+          description: forbiden
+        401:
+          description: unauthorized
+        500:
+          description: internalservererror
+
+  /admin/course/{id}:
+    get:
+      summary: get all course
+      tags: [course(Admin)]
+      parameters:
+        - in: path
+          name: id
+          type: string
+          description: id of course
+
+      responses:
+        200:
+          description: success
+        404:
+          description: not found

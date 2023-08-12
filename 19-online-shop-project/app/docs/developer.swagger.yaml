@@ -1,0 +1,26 @@
+tags:
+  name: Developer-Routes
+  description: developer utiles
+
+/dev/hash-pass/{password}:
+  get:
+    summary: hash password
+    description: hash password using bcrypt from params
+    parameters:
+      - in: path
+        name: password
+        required: true
+        type: string
+    tags: [Developer-Routes]
+    responses:
+      200:
+        description: Success
+
+/dev/random-number:
+  get:
+    summary: random number
+    description: generate random number
+    tags: [Developer-Routes]
+    responses:
+      200:
+        description: Success

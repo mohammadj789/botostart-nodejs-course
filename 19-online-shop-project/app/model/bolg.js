@@ -8,6 +8,7 @@ const blogSchema = new mongoose.Schema(
       ref: "user",
       required: true,
     },
+
     title: { type: String, required: true },
     text: { type: String, required: true },
     short_text: { type: String, required: true },

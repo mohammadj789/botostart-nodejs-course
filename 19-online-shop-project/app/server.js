@@ -60,7 +60,7 @@ module.exports = class Application {
               },
             ],
           },
-          apis: ["./app/router/*/*.js", "./app/router/*.js"],
+          apis: ["./app/docs/*.yaml", "./app/docs/*/*.yaml"],
         }),
         { explorer: true }
       )

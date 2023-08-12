@@ -2,10 +2,8 @@ const multer = require("multer");
 const path = require("path");
 
 const fs = require("fs");
-const {
-  createBlogSchema,
-} = require("../validator/admin/blog.Schema");
-const { object } = require("joi");
+
+
 const createHttpError = require("http-errors");
 const createRoute = (req) => {
   const date = new Date();
@@ -48,14 +46,6 @@ const storage = multer.diskStorage({
       const ext = path.extname(file.originalname);
       const fileName =
         Date.now() * Math.round((Math.random() + 2) * 13) + ext;
-      // if (req.body.fileName) {
-      //   const bodyFile = req.body.fileName;
-      //   if (!Array.isArray(bodyFile)) {
-      //     req.body.fileName = [bodyFile];
-      //     req.body.fileName.push(fileName);
-      //   } else if (Array.isArray(bodyFile) && bodyFile.length)
-      //     req.body.fileName.push(fileName);
-      // } else req.body.fileName = fileName;
 
       if (req.body.fileName) req.body.fileName += `#${fileName}`;
       else req.body.fileName = fileName;

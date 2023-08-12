@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 
-mongoose;
+
 const comentSchema = new mongoose.Schema({
   user: {
     type: mongoose.Types.ObjectId,

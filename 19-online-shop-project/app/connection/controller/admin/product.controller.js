@@ -61,7 +61,7 @@ class ProductController extends Controller {
             : "virtual",
         feature: { height, width, length, weight },
       });
-
+      if (!product) throw createHttpError.InternalServerError();
       res
         .status(httpStatus.CREATED)
         .send({ status: httpStatus.CREATED, data: { product } });
